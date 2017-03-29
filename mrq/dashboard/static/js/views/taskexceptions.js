@@ -13,7 +13,8 @@ define(["jquery", "underscore", "views/generic/datatablepage", "models"],functio
     initFilters: function () {
       this.filters = {
         "name": this.options.params.name || "",
-        "exception": this.options.params.exception || ""
+        "exception": this.options.params.exception || "",
+        "jobs": this.options.params.jobs || ""
       };
     },
 

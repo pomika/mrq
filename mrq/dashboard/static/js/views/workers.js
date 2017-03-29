@@ -8,13 +8,19 @@ define(["jquery", "underscore", "views/generic/datatablepage", "models", "moment
 
     events:{
       "change .js-datatable-filters-showstopped": "filterschanged",
+      "click .js-datatable-filters-submit": "filterschanged",
       "click .js-workers-io": "showworkerio",
     },
 
     initFilters: function() {
 
       this.filters = {
-        "showstopped": this.options.params.showstopped||""
+        "showstopped": this.options.params.showstopped||"",
+        "id": this.options.params.id||"",
+        "name": this.options.params.name||"",
+        "queue": this.options.params.queue||"",
+        "status": this.options.params.status||"",
+        "donejobs": this.options.params.donejobs||""
       };
 
     },
@@ -23,6 +29,27 @@ define(["jquery", "underscore", "views/generic/datatablepage", "models", "moment
       this.options = options;
       this.initFilters();
       this.flush();
+    },
+
+    filterschanged:function(evt) {
+
+      var self = this;
+
+      if (evt) {
+        evt.preventDefault();
+        evt.stopPropagation();
+      }
+
+      _.each(self.filters, function(v, k) {
+        var field = self.$(".js-datatable-filters-"+k);
+        if (field.is(':checkbox')) {
+          self.filters[k] = field.is(':checked')?"1":"";
+        } else {
+          self.filters[k] = field.val();
+        }
+      });
+
+      window.location = "/#workers?" + $.param(self.filters, true).replace(/\+/g, "%20");
     },
 
     showworkerio: function(evt) {
