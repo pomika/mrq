@@ -72,7 +72,22 @@ def api_task_exceptions():
 
     stats = list(connections.mongodb_jobs.mrq_jobs.aggregate(group_criteria))
 
-    stats.sort(key=lambda x: -x["jobs"])
+    if request.args.get("iSortCol_0") == "0":
+        if (request.args.get("sSortDir_0") == "asc"):
+            stats.sort(key=lambda x: x["_id"]["path"])
+        elif (request.args.get("sSortDir_0") == "desc"):
+            stats.sort(key=lambda x: x["_id"]["path"], reverse=True)
+    elif request.args.get("iSortCol_0") == "1":
+        if (request.args.get("sSortDir_0") == "asc"):
+            stats.sort(key=lambda x: x["_id"]["exceptiontype"])
+        elif (request.args.get("sSortDir_0") == "desc"):
+            stats.sort(key=lambda x: x["_id"]["exceptiontype"], reverse=True)
+    elif request.args.get("iSortCol_0") == "2":
+        if (request.args.get("sSortDir_0") == "asc"):
+            stats.sort(key=lambda x: x["jobs"])
+        elif (request.args.get("sSortDir_0") == "desc"):
+            stats.sort(key=lambda x: x["jobs"], reverse=True)
+
     start = int(request.args.get("iDisplayStart", 0))
     end = int(request.args.get("iDisplayLength", 20)) + start
 
@@ -89,13 +104,22 @@ def api_task_exceptions():
 @app.route('/api/datatables/status')
 @requires_auth
 def api_jobstatuses():
+    sort = {"$sort": {"status": 1}}
+
+    if request.args.get("iSortCol_0") == "0":
+        if (request.args.get("sSortDir_0") == "desc"):
+            sort = {"$sort": {"status": -1}}
     stats = list(connections.mongodb_jobs.mrq_jobs.aggregate([
         # https://jira.mongodb.org/browse/SERVER-11447
         {"$sort": {"status": 1}},
         {"$group": {"_id": "$status", "jobs": {"$sum": 1}}}
     ]))
 
-    stats.sort(key=lambda x: x["_id"])
+    if request.args.get("iSortCol_0") == "1":
+        if (request.args.get("sSortDir_0") == "asc"):
+            stats.sort(key=lambda x: x["jobs"])
+        elif (request.args.get("sSortDir_0") == "desc"):
+            stats.sort(key=lambda x: x["jobs"], reverse=True)
 
     data = {
         "aaData": stats,
@@ -125,7 +149,16 @@ def api_taskpaths():
 
     stats = list(connections.mongodb_jobs.mrq_jobs.aggregate(group_criteria))
 
-    stats.sort(key=lambda x: -x["jobs"])
+    if request.args.get("iSortCol_0") == "0":
+        if (request.args.get("sSortDir_0") == "asc"):
+            stats.sort(key=lambda x: x["_id"])
+        elif (request.args.get("sSortDir_0") == "desc"):
+            stats.sort(key=lambda x: x["_id"], reverse=True)
+    elif request.args.get("iSortCol_0") == "1":
+        if (request.args.get("sSortDir_0") == "asc"):
+            stats.sort(key=lambda x: x["jobs"])
+        elif (request.args.get("sSortDir_0") == "desc"):
+            stats.sort(key=lambda x: x["jobs"], reverse=True)
 
     data = {
         "aaData": stats,
@@ -258,8 +291,21 @@ def api_datatables(unit):
                 q["jobs_to_dequeue"] = queue.count_jobs_to_dequeue()
 
             queues.append(q)
-
-        queues.sort(key=lambda x: -((x["jobs"] or 0) + x["size"]))
+        if request.args.get("iSortCol_0") == "0":
+            if (request.args.get("sSortDir_0") == "asc"):
+                queues.sort(key=lambda x: x["name"])
+            elif (request.args.get("sSortDir_0") == "desc"):
+                queues.sort(key=lambda x: x["name"], reverse=True)
+        elif request.args.get("iSortCol_0") == "1":
+            if (request.args.get("sSortDir_0") == "asc"):
+                queues.sort(key=lambda x: x["jobs"])
+            elif (request.args.get("sSortDir_0") == "desc"):
+                queues.sort(key=lambda x: x["jobs"], reverse=True)
+        elif request.args.get("iSortCol_0") == "2":
+            if (request.args.get("sSortDir_0") == "asc"):
+                queues.sort(key=lambda x: x["size"])
+            elif (request.args.get("sSortDir_0") == "desc"):
+                queues.sort(key=lambda x: x["size"], reverse=True)
 
         data = {
             "aaData": queues,
@@ -274,6 +320,31 @@ def api_datatables(unit):
 
         if request.args.get("showstopped"):
             query = {}
+        if request.args.get("iSortCol_0") == "0":
+            if (request.args.get("sSortDir_0") == "asc"):
+                sort = [("_id", 1)]
+            elif (request.args.get("sSortDir_0") == "desc"):
+                sort = [("_id", -1)]
+        elif request.args.get("iSortCol_0") == "2":
+            if (request.args.get("sSortDir_0") == "asc"):
+                sort = [("status", 1)]
+            elif (request.args.get("sSortDir_0") == "desc"):
+                sort = [("status", -1)]
+        elif request.args.get("iSortCol_0") == "3":
+            if (request.args.get("sSortDir_0") == "asc"):
+                sort = [("datestarted", 1)]
+            elif (request.args.get("sSortDir_0") == "desc"):
+                sort = [("datestarted", -1)]
+        elif request.args.get("iSortCol_0") == "4":
+            if (request.args.get("sSortDir_0") == "asc"):
+                sort = [("process.cpu.percent", 1)]
+            elif (request.args.get("sSortDir_0") == "desc"):
+                sort = [("process.cpu.percent", -1)]
+        elif request.args.get("iSortCol_0") == "5":
+            if (request.args.get("sSortDir_0") == "asc"):
+                sort = [("process.mem.total", 1)]
+            elif (request.args.get("sSortDir_0") == "desc"):
+                sort = [("process.mem.total", -1)]
 
     elif unit == "scheduled_jobs":
         collection = connections.mongodb_jobs.mrq_scheduled_jobs
@@ -294,11 +365,49 @@ def api_datatables(unit):
             except Exception as e:  # pylint: disable=broad-except
                 print("Error will converting form JSON: %s" % e)
 
+        if request.args.get("iSortCol_0") == "0":
+            if (request.args.get("sSortDir_0") == "asc"):
+                sort = [("path", 1)]
+            elif (request.args.get("sSortDir_0") == "desc"):
+                sort = [("path", -1)]
+        elif(request.args.get("iSortCol_0") == "1"):
+            if (request.args.get("sSortDir_0") == "asc"):
+                sort = [("interval", 1)]
+            elif (request.args.get("sSortDir_0") == "desc"):
+                sort = [("interval", -1)]
+        elif(request.args.get("iSortCol_0") == "2"):
+            if (request.args.get("sSortDir_0") == "asc"):
+                sort = [("datelastqueued", 1)]
+            elif (request.args.get("sSortDir_0") == "desc"):
+                sort = [("datelastqueued", -1)]
     elif unit == "jobs":
 
         fields = None
         query = build_api_datatables_query(request)
         sort = [("_id", 1)]
+        if request.args.get("iSortCol_0") == "0":
+            if (request.args.get("sSortDir_0") == "desc"):
+                sort = [("_id", -1)]
+        elif(request.args.get("iSortCol_0") == "2"):
+            if (request.args.get("sSortDir_0") == "asc"):
+                sort = [("status", 1)]
+            elif (request.args.get("sSortDir_0") == "desc"):
+                sort = [("status", -1)]
+        elif (request.args.get("iSortCol_0") == "3"):
+            if (request.args.get("sSortDir_0") == "asc"):
+                sort = [("datestarted", 1)]
+            elif (request.args.get("sSortDir_0") == "desc"):
+                sort = [("datestarted", -1)]
+        elif (request.args.get("iSortCol_0") == "4"):
+            if (request.args.get("sSortDir_0") == "asc"):
+                sort = [("queue", 1)]
+            elif (request.args.get("sSortDir_0") == "desc"):
+                sort = [("queue", -1)]
+        elif (request.args.get("iSortCol_0") == "5"):
+            if (request.args.get("sSortDir_0") == "asc"):
+                sort = [("worker", 1)]
+            elif (request.args.get("sSortDir_0") == "desc"):
+                sort = [("worker", -1)]
 
         # We can't search easily params because we store it as decoded JSON in mongo :(
         # Add a string index?
