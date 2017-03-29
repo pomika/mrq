@@ -10,9 +10,8 @@ define(["jquery", "underscore", "views/generic/datatablepage", "models", "moment
     },
 
     renderDatatable:function() {
-      this.unbindTimeFilterClick();
       var self = this;
-
+      this.unbindFilterChange();
       var datatableConfig = self.getCommonDatatableConfig("status");
 
       _.extend(datatableConfig, {
@@ -48,7 +47,6 @@ define(["jquery", "underscore", "views/generic/datatablepage", "models", "moment
             "sClass": "col-eta",
             "sType":"numeric",
             "mData":function(source, type, val) {
-              console.log()
               return (Math.round(self.getCounterSpeed("index.status."+source._id) * 100) / 100) + " jobs/second";
             }
           },

@@ -21,15 +21,15 @@ define(["jquery", "underscore", "views/generic/datatablepage", "models", "moment
         "exceptiontype": this.options.params.exceptiontype||"",
         "params": this.options.params.params||"",
         "id": this.options.params.id||"",
-        "daterange": this.options.params.daterange||""
+        "daterange": this.cookieManager.getCookie('daterange-val')||""
       };
-      this.updateTimeFilterClickBind(this);
     },
 
     setOptions:function(options) {
       this.options = options;
       this.initFilters();
       this.flush();
+      this.bindTimeFilterChange(this);
     },
 
     refresh_logs:function(job_id) {
@@ -259,7 +259,6 @@ define(["jquery", "underscore", "views/generic/datatablepage", "models", "moment
     renderDatatable:function() {
 
       var self = this;
-
       var datatableConfig = self.getCommonDatatableConfig("jobs");
 
       _.extend(datatableConfig, {
@@ -416,9 +415,9 @@ define(["jquery", "underscore", "views/generic/datatablepage", "models", "moment
       });
 
       this.initDataTable(datatableConfig);
-
       if (!_.any(this.filters, function(v, k) {
-        return v;
+        if(k != 'daterange')
+          return v;
       })) {
         this.$(".js-jobs-groupactions").hide();
       }
@@ -438,12 +437,10 @@ define(["jquery", "underscore", "views/generic/datatablepage", "models", "moment
         self.filters[k] = self.$(".js-datatable-filters-"+k).val();
       });
 
-      self.filters.daterange = $(".js-datatable-filters-daterange").val();
-      self.cookieManager.setCookie("daterange", self.lastSelectedTimeFilterLabel, 365);
+      self.filters.daterange = self.cookieManager.getCookie('daterange-val');
 
       window.location = "/#jobs?"+$.param(self.filters, true).replace(/\+/g, "%20");
     },
-
   });
 
 });

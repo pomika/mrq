@@ -15,9 +15,8 @@ define(["jquery", "underscore", "views/generic/datatablepage", "models", "moment
 
       this.filters = {
         "showstopped": this.options.params.showstopped||"",
-        "daterange": this.options.params.daterange||""
+        "daterange": this.cookieManager.getCookie('daterange-val')||""
       };
-      this.updateTimeFilterClickBind(this);
     },
 
     setOptions:function(options) {
@@ -28,7 +27,6 @@ define(["jquery", "underscore", "views/generic/datatablepage", "models", "moment
 
     showworkerio: function(evt) {
       var self = this;
-
       var worker_id = $(evt.currentTarget).data("workerid");
 
       var worker_data = _.find(this.dataTableRawData.aaData, function(worker) {
@@ -47,7 +45,7 @@ define(["jquery", "underscore", "views/generic/datatablepage", "models", "moment
     renderDatatable:function() {
 
       var self = this;
-
+      this.bindTimeFilterChange(this);
       var datatableConfig = self.getCommonDatatableConfig("workers");
 
       _.extend(datatableConfig, {
@@ -199,8 +197,7 @@ define(["jquery", "underscore", "views/generic/datatablepage", "models", "moment
         self.filters[k] = self.$(".js-datatable-filters-"+k).val();
       });
 
-      self.filters.daterange = $(".js-datatable-filters-daterange").val();
-      self.cookieManager.setCookie("daterange", self.lastSelectedTimeFilterLabel, 365);
+      self.filters.daterange = this.cookieManager.getCookie('daterange-val');
 
       window.location = "/#workers?"+$.param(self.filters, true).replace(/\+/g, "%20");
     },

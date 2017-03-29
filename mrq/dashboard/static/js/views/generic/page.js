@@ -8,7 +8,6 @@ define(["backbone", "underscore", "jquery", "moment", "daterangepicker"],functio
 
 
     alwaysRenderOnShow:false,
-    lastSelectedTimeFilterLabel: "",
 
     // This will be called once before the first render only.
     init:function() {
@@ -43,6 +42,9 @@ define(["backbone", "underscore", "jquery", "moment", "daterangepicker"],functio
         startRange = lastMonthRange;
       else if(lastRangeUsed == "This Year")
         startRange = thisYearRange;
+
+      var val = startRange.start.format('DD/MM/YYYY HH:mm') + ' - ' + startRange.end.format('DD/MM/YYYY HH:mm');
+      self.cookieManager.setCookie("daterange-val", val, 365);
 
       $('#time_filter').daterangepicker({
         "timePicker24Hour": true,
@@ -83,11 +85,14 @@ define(["backbone", "underscore", "jquery", "moment", "daterangepicker"],functio
         "startDate": startRange.start,
         "endDate": startRange.end,
       }, function (start, end, label) {
-        self.lastSelectedTimeFilterLabel = label;
+        $('#time_filter span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+        self.cookieManager.setCookie("daterange", label, 365);
+        self.cookieManager.setCookie("daterange", label, 365);
+        var val = start.format('DD/MM/YYYY HH:mm') + ' - ' + end.format('DD/MM/YYYY HH:mm');
+        self.cookieManager.setCookie("daterange-val", val, 365);
+        $('#time_filter').trigger('change');
       });
-      $('.clear-date-range-filter').click(function(){
-        $('#time_filter').val('');
-      });
+      $('#time_filter span').html(startRange.start.format('MMMM D, YYYY') + ' - ' + startRange.end.format('MMMM D, YYYY'));
     },
 
     addChildPage: function(id, childPage) {
@@ -278,121 +283,42 @@ define(["backbone", "underscore", "jquery", "moment", "daterangepicker"],functio
       return this;
     },
 
-    updateTimeFilterClickBind: function(self){
-      $('#time-filter-submit').unbind( 'click' ).bind( 'click', function() {
-        self.filterschanged();
-      });
-    },
-
-    unbindTimeFilterClick: function(){
-      $('#time-filter-submit').unbind( 'click' );
-    },
-
     timeFilter: {
       getTodayRange: function(){
-        var dateStart = new Date();
-        var dateEnd = new Date();
-        dateStart = this.getBeginingOfDay(dateStart);
-        dateEnd = this.getEndOfDay(dateEnd);
         return {
-          start: dateStart,
-          end: dateEnd
+          start: moment().startOf('day'),
+          end: moment().endOf('day')
         };
       },
       getYesterdayRange: function(){
-        var dateStart = new Date();
-        var dateEnd = new Date();
-        dateStart.setDate(dateStart.getDate() - 1);
-        dateStart = this.getBeginingOfDay(dateStart);
-
-        dateEnd.setDate(dateEnd.getDate() - 1);
-        dateEnd = this.getEndOfDay(dateEnd);
         return {
-          start: dateStart,
-          end: dateEnd
+          start: moment().subtract(1, 'days').startOf('day'),
+          end: moment().subtract(1, 'days').endOf('day')
         };
       },
       getLastXDays: function(x){
-        var dateStart = new Date();
-        var dateEnd = new Date();
-        dateStart.setDate(dateStart.getDate() - x);
-        dateStart = this.getBeginingOfDay(dateStart);
         return {
-          start: dateStart,
-          end: dateEnd
+          start: moment().subtract(x, 'days').startOf('day'),
+          end: moment().endOf('day')
         };
       },
       getThisMonthRange: function(){
-        var dateStart = new Date();
-        var dateEnd = new Date();
-        dateStart = this.getBeginingOfMonth(dateStart);
-
-        dateEnd = this.getEndOfMonth(dateEnd);
         return {
-          start: dateStart,
-          end: dateEnd
+          start: moment().startOf('month').startOf('day'),
+          end: moment().endOf('month').endOf('day')
         };
       },
       getLastMonthRange: function(){
-        var dateStart = new Date();
-        var dateEnd = new Date();
-        dateStart.setMonth(dateStart.getMonth() - 1);
-        dateStart = this.getBeginingOfMonth(dateStart);
-
-        dateEnd.setMonth(dateEnd.getMonth() - 1);
-        dateEnd = this.getEndOfMonth(dateEnd);
         return {
-          start: dateStart,
-          end: dateEnd
+          start: moment().subtract(1, 'month').startOf('month').startOf('day'),
+          end: moment().subtract(1, 'month').endOf('month').endOf('day')
         };
       },
       getThisYearRange: function(){
-        var dateStart = new Date();
-        var dateEnd = new Date();
-        dateStart = this.getBeginingOfYear(dateStart);
-
-        dateEnd = this.getEndOfYear(dateEnd);
         return {
-          start: dateStart,
-          end: dateEnd
+          start: moment().startOf('year'),
+          end: moment().endOf('year')
         };
-      },
-
-      getBeginingOfDay: function (date) {
-        date.setHours(0);
-        date.setMinutes(0);
-        date.setSeconds(0);
-        date.setMilliseconds(0);
-        return date;
-      },
-      getEndOfDay: function (date) {
-        date.setHours(23);
-        date.setMinutes(59);
-        date.setSeconds(59);
-        date.setMilliseconds(999);
-        return date;
-      },
-      getBeginingOfMonth: function (date) {
-        date.setDate(1);
-        date = this.getBeginingOfDay(date);
-        return date;
-      },
-      getEndOfMonth: function (date) {
-        date.setMonth(date.getMonth() + 1);
-        date = this.getBeginingOfMonth(date);
-        date.setMilliseconds(-1);
-        return date;
-      },
-      getBeginingOfYear: function (date) {
-        date.setMonth(0);
-        date = this.getBeginingOfMonth(date);
-        return date;
-      },
-      getEndOfYear: function(date){
-        date.setFullYear(date.getFullYear() + 1);
-        date = this.getBeginingOfYear(date);
-        date.setMilliseconds(-1);
-        return date;
       },
     },
 
@@ -418,7 +344,19 @@ define(["backbone", "underscore", "jquery", "moment", "daterangepicker"],functio
         }
         return "";
       }
-    }
+    },
+
+    bindTimeFilterChange: function(self){
+      $('#time_filter').unbind( 'change' ).bind( 'change', function() {
+        self.filterschanged();
+      });
+
+    },
+
+    unbindFilterChange: function(){
+      $('#time_filter').unbind( 'change' );
+    },
+
   });
 
 });

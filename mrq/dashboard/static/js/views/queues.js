@@ -10,9 +10,8 @@ define(["jquery", "underscore", "views/generic/datatablepage", "models"],functio
     },
 
     renderDatatable:function() {
-      this.unbindTimeFilterClick();
       var self = this;
-
+      this.unbindFilterChange();
       var datatableConfig = self.getCommonDatatableConfig("queues");
 
       _.extend(datatableConfig, {

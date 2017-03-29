@@ -14,7 +14,6 @@ define(["jquery", "underscore", "views/generic/datatablepage", "models"],functio
       this.filters = {
         "name": this.options.params.name || "",
       };
-      this.unbindTimeFilterClick();
     },
 
     setOptions: function (options) {
@@ -40,7 +39,7 @@ define(["jquery", "underscore", "views/generic/datatablepage", "models"],functio
     renderDatatable:function() {
 
       var self = this;
-
+      this.unbindFilterChange();
       var datatableConfig = self.getCommonDatatableConfig("taskpaths");
 
       _.extend(datatableConfig, {

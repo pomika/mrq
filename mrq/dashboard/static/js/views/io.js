@@ -10,7 +10,7 @@ define(["jquery", "underscore", "views/generic/datatablepage", "models"],functio
     },
 
     renderDatatable:function() {
-      this.unbindTimeFilterClick();
+      this.unbindFilterChange();
       var self = this;
 
       var unit_name = "ops";

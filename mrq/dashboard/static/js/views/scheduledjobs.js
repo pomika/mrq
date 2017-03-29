@@ -17,7 +17,6 @@ define(["jquery", "underscore", "views/generic/datatablepage", "models"],functio
         "last_queued": this.options.params.last_queued || "",
         "params": this.options.params.params || ""
       };
-      this.updateTimeFilterClickBind(this);
     },
 
     setOptions: function (options) {
@@ -44,7 +43,7 @@ define(["jquery", "underscore", "views/generic/datatablepage", "models"],functio
     renderDatatable:function() {
 
       var self = this;
-
+      this.unbindFilterChange();
       var datatableConfig = self.getCommonDatatableConfig("scheduled_jobs");
 
       _.extend(datatableConfig, {
