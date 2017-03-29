@@ -320,6 +320,18 @@ def api_datatables(unit):
 
         if request.args.get("showstopped"):
             query = {}
+
+        if request.args.get("id"):
+            query["_id"] = ObjectId(request.args.get("id"))
+        if request.args.get("name"):
+            query["name"] = {"$regex": request.args.get("name"), "$options": "-i"}
+        if request.args.get("queue"):
+            query["config.queues"] = {"$elemMatch": {"$regex": request.args.get("queue"), "$options": "-i"}}
+        if request.args.get("status"):
+            query["status"] = {"$regex": request.args.get("status"), "$options": "-i"}
+        if request.args.get("donejobs"):
+            query["done_jobs"] = int(request.args.get("donejobs"))
+
         if request.args.get("iSortCol_0") == "0":
             if (request.args.get("sSortDir_0") == "asc"):
                 sort = [("_id", 1)]
