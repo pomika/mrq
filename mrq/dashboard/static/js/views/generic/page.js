@@ -85,14 +85,20 @@ define(["backbone", "underscore", "jquery", "moment", "daterangepicker"],functio
         "startDate": startRange.start,
         "endDate": startRange.end,
       }, function (start, end, label) {
-        $('#time_filter span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+        if(label != "Custom Range")
+          $('#time_filter span').html(label);
+        else
+          $('#time_filter span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
         self.cookieManager.setCookie("daterange", label, 365);
         self.cookieManager.setCookie("daterange", label, 365);
         var val = start.format('DD/MM/YYYY HH:mm') + ' - ' + end.format('DD/MM/YYYY HH:mm');
         self.cookieManager.setCookie("daterange-val", val, 365);
         $('#time_filter').trigger('change');
       });
-      $('#time_filter span').html(startRange.start.format('MMMM D, YYYY') + ' - ' + startRange.end.format('MMMM D, YYYY'));
+      if(lastRangeUsed != "Custom Range")
+        $('#time_filter span').html(lastRangeUsed);
+      else
+        $('#time_filter span').html(startRange.start.format('MMMM D, YYYY') + ' - ' + startRange.end.format('MMMM D, YYYY'));
     },
 
     addChildPage: function(id, childPage) {
