@@ -16,7 +16,7 @@ define(["jquery", "underscore", "views/generic/datatablepage", "models", "moment
 
       this.filters = {
         "showstopped": this.options.params.showstopped||"",
-        "daterange": this.cookieManager.getCookie('daterange-val')||""
+        "daterange": this.cookieManager.getCookie('daterange-val')||"",
         "showstopped": this.options.params.showstopped||"",
         "id": this.options.params.id||"",
         "name": this.options.params.name||"",

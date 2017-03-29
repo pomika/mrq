@@ -111,7 +111,7 @@ def api_jobstatuses():
             sort = {"$sort": {"status": -1}}
     stats = list(connections.mongodb_jobs.mrq_jobs.aggregate([
         # https://jira.mongodb.org/browse/SERVER-11447
-        {"$sort": {"status": 1}},
+        sort,
         {"$group": {"_id": "$status", "jobs": {"$sum": 1}}}
     ]))
 
@@ -354,8 +354,6 @@ def api_datatables(unit):
             query["path"] = {"$regex": request.args.get("name"), "$options": "-i"}
         if (request.args.get("interval")):
             query["interval"] = {"$regex": request.args.get("interval"), "$options": "-i"}
-        if (request.args.get("params")):
-            query["params"] = request.args.get("params")
         if request.args.get("params"):
             try:
                 params_dict = json.loads(request.args.get("params"))
