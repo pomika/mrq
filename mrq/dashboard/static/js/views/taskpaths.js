@@ -13,6 +13,7 @@ define(["jquery", "underscore", "views/generic/datatablepage", "models"],functio
     initFilters: function () {
       this.filters = {
         "name": this.options.params.name || "",
+        "jobs": this.options.params.jobs || ""
       };
     },
 
@@ -33,6 +34,7 @@ define(["jquery", "underscore", "views/generic/datatablepage", "models"],functio
       _.each(self.filters, function (v, k) {
         self.filters[k] = self.$(".js-datatable-filters-" + k).val();
       });
+
       window.location = "/#taskpaths?" + $.param(self.filters, true).replace(/\+/g, "%20");
     },
 

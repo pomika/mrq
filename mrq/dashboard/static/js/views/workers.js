@@ -8,6 +8,7 @@ define(["jquery", "underscore", "views/generic/datatablepage", "models", "moment
 
     events:{
       "change .js-datatable-filters-showstopped": "filterschanged",
+      "click .js-datatable-filters-submit": "filterschanged",
       "click .js-workers-io": "showworkerio",
     },
 
@@ -16,6 +17,12 @@ define(["jquery", "underscore", "views/generic/datatablepage", "models", "moment
       this.filters = {
         "showstopped": this.options.params.showstopped||"",
         "daterange": this.cookieManager.getCookie('daterange-val')||""
+        "showstopped": this.options.params.showstopped||"",
+        "id": this.options.params.id||"",
+        "name": this.options.params.name||"",
+        "queue": this.options.params.queue||"",
+        "status": this.options.params.status||"",
+        "donejobs": this.options.params.donejobs||""
       };
     },
 

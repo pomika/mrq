@@ -59,13 +59,16 @@ def api_task_exceptions():
     group_criteria.append({"$match": {"status": "failed"}})
 
     if (request.args.get("name")):
-        group_criteria.append({"$match": {"path": request.args.get("name")}})
+        group_criteria.append({"$match": {"path": {"$regex": request.args.get("name"), "$options": "-i"}}})
 
     if (request.args.get("exception")):
-        group_criteria.append({"$match": {"exceptiontype": request.args.get("exception")}})
+        group_criteria.append({"$match": {"exceptiontype": {"$regex": request.args.get("exception"), "$options": "-i"}}})
 
     group_criteria.append({"$group": {"_id": {"path": "$path", "exceptiontype": "$exceptiontype"},
                                       "jobs": {"$sum": 1}}})
+
+    if (request.args.get("jobs")):
+        group_criteria.append({"$match": {"jobs": int(request.args.get("jobs"))}})
 
     stats = list(connections.mongodb_jobs.mrq_jobs.aggregate(group_criteria))
 
@@ -113,9 +116,12 @@ def api_taskpaths():
 
     if request.args.get("name"):
         name = request.args.get("name")
-        group_criteria.append({"$match": {"path": name}})
+        group_criteria.append({"$match": {"path": {"$regex": name, "$options": "-i"}}})
 
     group_criteria.append({"$group": {"_id": "$path", "jobs": {"$sum": 1}}})
+
+    if request.args.get("jobs"):
+        group_criteria.append({"$match": {"jobs": int(request.args.get("jobs"))}})
 
     stats = list(connections.mongodb_jobs.mrq_jobs.aggregate(group_criteria))
 
@@ -163,11 +169,7 @@ def build_api_datatables_query(req):
 
         for param in ["queue", "path", "exceptiontype"]:
             if req.args.get(param):
-                if "*" in req.args[param]:
-                    regexp = "^%s$" % re.escape(req.args[param]).replace("*", ".*")
-                    query[param] = re.compile(regexp)
-                else:
-                    query[param] = req.args[param]
+                query[param] = {"$regex": req.args[param], "$options": "-i"}
 
         if req.args.get("status"):
             statuses = req.args["status"].split("-")
@@ -273,26 +275,24 @@ def api_datatables(unit):
         if request.args.get("showstopped"):
             query = {}
 
-        # time filter
-        if (request.args.get("daterange")):
-            daterange = request.args.get("daterange").split(" - ")
-
-            date_start = get_datetime_from_str(daterange[0])
-
-            date_end = get_datetime_from_str(daterange[1])
-
-            query["datestarted"] = {"$gt": date_start, "$lt": date_end}
-
     elif unit == "scheduled_jobs":
         collection = connections.mongodb_jobs.mrq_scheduled_jobs
         fields = None
         query = {}
         if (request.args.get("name")):
-            query["path"] = request.args.get("name")
+            query["path"] = {"$regex": request.args.get("name"), "$options": "-i"}
         if (request.args.get("interval")):
-            query["interval"] = request.args.get("interval")
+            query["interval"] = {"$regex": request.args.get("interval"), "$options": "-i"}
         if (request.args.get("params")):
             query["params"] = request.args.get("params")
+        if request.args.get("params"):
+            try:
+                params_dict = json.loads(request.args.get("params"))
+
+                for key in params_dict:
+                    query["params.%s" % key] = {"$regex": params_dict[key], "$options": "-i"}
+            except Exception as e:  # pylint: disable=broad-except
+                print("Error will converting form JSON: %s" % e)
 
     elif unit == "jobs":
 

@@ -206,6 +206,35 @@
                 </label>
               </div>
             </div>
+            <div class="form-group">
+              <label class="sr-only" for="workers-form-id">Id</label>
+              <input type="text" class="form-control input-sm js-datatable-filters-id"
+                     id="workers-form-id" placeholder="Id" value="<%- filters.id %>">
+            </div>
+            <div class="form-group">
+              <label class="sr-only" for="workers-form-name">Name</label>
+              <input type="text" class="form-control input-sm js-datatable-filters-name"
+                     id="workers-form-name" placeholder="Name" value="<%- filters.name %>">
+            </div>
+            <div class="form-group">
+              <label class="sr-only" for="workers-form-name">Queue</label>
+              <input type="text" class="form-control input-sm js-datatable-filters-queue"
+                     id="workers-form-queue" placeholder="Queue" value="<%- filters.queue %>">
+            </div>
+            <div class="form-group">
+              <label class="sr-only" for="workers-form-name">Status</label>
+              <input type="text" class="form-control input-sm js-datatable-filters-status"
+                     id="workers-form-status" placeholder="Status" value="<%- filters.status %>">
+            </div>
+            <div class="form-group">
+              <label class="sr-only" for="workers-form-name">Done Jobs</label>
+              <input type="number" class="form-control input-sm js-datatable-filters-donejobs"
+                     id="workers-form-donejobs" placeholder="Done Jobs" value="<%- filters.donejobs %>">
+            </div>
+
+            <button type="submit" class="btn btn-default js-datatable-filters-submit input-sm" style="padding:5px">
+              OK
+            </button>
 
           </form>
         </div>
@@ -263,6 +292,9 @@
               <label class="sr-only" for="taskpath-form-name">Name</label>
               <input type="text" class="form-control input-sm js-datatable-filters-name" id="taskpath-form-name"
                      placeholder="Name" value="<%- filters.name %>">
+            <label class="sr-only" for="taskpath-form-name">Jobs</label>
+            <input type="number" class="form-control input-sm js-datatable-filters-jobs" id="taskpath-form-jobs"
+                   placeholder="Jobs" value="<%- filters.jobs %>">
             </div>
 
             <button type="submit" class="btn btn-default js-datatable-filters-submit input-sm" style="padding:5px">
@@ -295,6 +327,11 @@
               <label class="sr-only" for="taskexceptions-form-exception">Exception</label>
               <input type="text" class="form-control input-sm js-datatable-filters-exception"
                      id="taskexceptions-form-exception" placeholder="Exception" value="<%- filters.exception %>">
+            </div>
+            <div class="form-group">
+              <label class="sr-only" for="taskexceptions-form-exception">Jobs</label>
+              <input type="number" class="form-control input-sm js-datatable-filters-jobs"
+                     id="taskexceptions-form-jobs" placeholder="Jobs" value="<%- filters.jobs %>">
             </div>
 
             <button type="submit" class="btn btn-default js-datatable-filters-submit input-sm" style="padding:5px">
