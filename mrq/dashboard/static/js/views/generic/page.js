@@ -51,7 +51,7 @@ define(["backbone", "underscore", "jquery", "moment", "daterangepicker"],functio
       else if(lastRangeUsed == "This Year")
         startRange = thisYearRange;
 
-      var val = Date.parse(startRange.start.toDate().toUTCString()) + ' - ' + Date.parse(startRange.end.toDate().toUTCString());
+      var val = Date.parse(startRange.start.toDate().toUTCString()) + '-' + Date.parse(startRange.end.toDate().toUTCString());
       self.cookieManager.setCookie("daterange-val", val, 365);
 
       $('#time_filter').daterangepicker({
@@ -102,7 +102,7 @@ define(["backbone", "underscore", "jquery", "moment", "daterangepicker"],functio
         "startDate": startRange.start,
         "endDate": startRange.end,
       }, function (start, end, label) {
-        var val; //Date.parse(start.toDate().toUTCString()) + ' - ' + Date.parse(end.toDate().toUTCString());
+        var val = Date.parse(start.toDate().toUTCString()) + '-' + Date.parse(end.toDate().toUTCString());
         var now = Date.parse(moment().toDate().toUTCString());
         var momentStarted = Date.parse(self.timeFilterStarted.toDate().toUTCString());
         var diff = now - momentStarted;
@@ -115,10 +115,10 @@ define(["backbone", "underscore", "jquery", "moment", "daterangepicker"],functio
 
           startDate += diff;
           endDate += diff;
-          val = startDate + ' - ' + endDate;
+          val = startDate + '-' + endDate;
         }
         else {
-          $('#time_filter span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+          $('#time_filter span').html(start.format('MMMM D, YYYY') + '-' + end.format('MMMM D, YYYY'));
         }
 
         self.cookieManager.setCookie("daterange", label, 365);
@@ -129,7 +129,7 @@ define(["backbone", "underscore", "jquery", "moment", "daterangepicker"],functio
       if(lastRangeUsed != "Custom Range")
         $('#time_filter span').html(lastRangeUsed);
       else
-        $('#time_filter span').html(startRange.start.format('MMMM D, YYYY') + ' - ' + startRange.end.format('MMMM D, YYYY'));
+        $('#time_filter span').html(startRange.start.format('MMMM D, YYYY') + '-' + startRange.end.format('MMMM D, YYYY'));
     },
 
     addChildPage: function(id, childPage) {

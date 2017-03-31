@@ -225,7 +225,8 @@ def build_api_datatables_query(req):
 
         # time filter
         if (req.args.get("daterange")):
-            daterange = req.args.get("daterange").split(" - ")
+            print(req.args.get("daterange"))
+            daterange = req.args.get("daterange").split("-")
             tem = int(daterange[0]) / 1000
             date_start = hex(tem)
             start = ObjectId(date_start[2:len(date_start) - 1] + "0000000000000000")
@@ -337,7 +338,7 @@ def api_datatables(unit):
             query["done_jobs"] = int(request.args.get("donejobs"))
 
         if request.args.get("datestarted"):
-            daterange = request.args.get("datestarted").split(" - ")
+            daterange = request.args.get("datestarted").split("-")
 
             date_start = datetime.datetime.utcfromtimestamp(float(daterange[0][0:-3]))
             date_end = datetime.datetime.utcfromtimestamp(float(daterange[1][0:-3]))
