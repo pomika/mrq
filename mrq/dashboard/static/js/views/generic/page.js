@@ -57,6 +57,7 @@ define(["backbone", "underscore", "jquery", "moment", "daterangepicker"],functio
       $('#time_filter').daterangepicker({
         "timePicker24Hour": true,
         "timePicker": true,
+        "opens": "left",
         "locale": {
           "format": "DD/MM/YYYY HH:mm",
         },

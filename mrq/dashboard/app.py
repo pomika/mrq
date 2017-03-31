@@ -224,8 +224,8 @@ def build_api_datatables_query(req):
                 print("Error will converting form JSON: %s" % e)
 
         # time filter
-        if (request.args.get("daterange")):
-            daterange = request.args.get("daterange").split(" - ")
+        if (req.args.get("daterange")):
+            daterange = req.args.get("daterange").split(" - ")
             tem = int(daterange[0]) / 1000
             date_start = hex(tem)
             start = ObjectId(date_start[2:len(date_start) - 1] + "0000000000000000")
@@ -336,9 +336,11 @@ def api_datatables(unit):
         if request.args.get("donejobs"):
             query["done_jobs"] = int(request.args.get("donejobs"))
 
+        if request.args.get("datestarted"):
+            daterange = request.args.get("datestarted").split(" - ")
+
             date_start = datetime.datetime.utcfromtimestamp(float(daterange[0][0:-3]))
             date_end = datetime.datetime.utcfromtimestamp(float(daterange[1][0:-3]))
-            print(date_start)
 
             query["datestarted"] = {"$gt": date_start, "$lt": date_end}
         if request.args.get("iSortCol_0") == "0":
