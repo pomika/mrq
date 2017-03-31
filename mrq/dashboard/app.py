@@ -17,6 +17,7 @@ from bson import ObjectId
 import json
 import argparse
 import datetime
+import string
 from werkzeug.serving import run_simple
 
 sys.path.insert(0, os.getcwd())
@@ -175,8 +176,7 @@ def build_api_datatables_query(req):
                 query["status"] = statuses[0]
             else:
                 query["status"] = {"$in": statuses}
-        if req.args.get("id"):
-            query["_id"] = ObjectId(req.args.get("id"))
+
         if req.args.get("worker"):
             query["worker"] = ObjectId(req.args.get("worker"))
 
@@ -192,12 +192,17 @@ def build_api_datatables_query(req):
         # time filter
         if (request.args.get("daterange")):
             daterange = request.args.get("daterange").split(" - ")
+            tem = int(daterange[0]) / 1000
+            date_start = hex(tem)
+            start = ObjectId(date_start[2:len(date_start) - 1] + "0000000000000000")
 
-            date_start = get_datetime_from_str(daterange[0])
+            date_end = hex(int(daterange[1]) / 1000)
+            end = ObjectId(date_end[2:len(date_end) - 1] + "0000000000000000")
 
-            date_end = get_datetime_from_str(daterange[1])
+            query["_id"] = {"$gt": start, "$lt": end}
+        if req.args.get("id"):
+            query["_id"] = ObjectId(req.args.get("id"))
 
-            query["datestarted"] = {"$gt": date_start, "$lt": date_end}
 
     return query
 
@@ -277,9 +282,9 @@ def api_datatables(unit):
         if (request.args.get("daterange")):
             daterange = request.args.get("daterange").split(" - ")
 
-            date_start = get_datetime_from_str(daterange[0])
-
-            date_end = get_datetime_from_str(daterange[1])
+            date_start = datetime.datetime.utcfromtimestamp(float(daterange[0][0:-3]))
+            date_end = datetime.datetime.utcfromtimestamp(float(daterange[1][0:-3]))
+            print(date_start)
 
             query["datestarted"] = {"$gt": date_start, "$lt": date_end}
 
@@ -299,7 +304,6 @@ def api_datatables(unit):
         fields = None
         query = build_api_datatables_query(request)
         sort = [("_id", 1)]
-
         # We can't search easily params because we store it as decoded JSON in mongo :(
         # Add a string index?
         # if request.args.get("sSearch"):

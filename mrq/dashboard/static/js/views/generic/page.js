@@ -8,6 +8,7 @@ define(["backbone", "underscore", "jquery", "moment", "daterangepicker"],functio
 
 
     alwaysRenderOnShow:false,
+    timeFilterStarted: null,
 
     // This will be called once before the first render only.
     init:function() {
@@ -18,6 +19,9 @@ define(["backbone", "underscore", "jquery", "moment", "daterangepicker"],functio
 
     initTimeFilter: function () {
       var self = this;
+      this.timeFilterStarted = moment();
+      var last15MinutesRange = this.timeFilter.getLastXMinutes(15);
+      var last30MinutesRange = this.timeFilter.getLastXMinutes(30);
       var todayRange = this.timeFilter.getTodayRange();
       var yesterdayRange = this.timeFilter.getYesterdayRange();
       var last7DaysRange = this.timeFilter.getLastXDays(7);
@@ -30,6 +34,10 @@ define(["backbone", "underscore", "jquery", "moment", "daterangepicker"],functio
       var startRange = thisYearRange;
       if(lastRangeUsed == "Today")
         startRange = todayRange;
+      else if(lastRangeUsed == "Last 15 Minutes")
+        startRange = last15MinutesRange;
+      else if(lastRangeUsed == "Last 30 Minutes")
+        startRange = last30MinutesRange;
       else if(lastRangeUsed == "Yesterday")
         startRange = yesterdayRange;
       else if(lastRangeUsed == "Last 7 Days")
@@ -43,7 +51,7 @@ define(["backbone", "underscore", "jquery", "moment", "daterangepicker"],functio
       else if(lastRangeUsed == "This Year")
         startRange = thisYearRange;
 
-      var val = startRange.start.format('DD/MM/YYYY HH:mm') + ' - ' + startRange.end.format('DD/MM/YYYY HH:mm');
+      var val = Date.parse(startRange.start.toDate().toUTCString()) + ' - ' + Date.parse(startRange.end.toDate().toUTCString());
       self.cookieManager.setCookie("daterange-val", val, 365);
 
       $('#time_filter').daterangepicker({
@@ -53,6 +61,14 @@ define(["backbone", "underscore", "jquery", "moment", "daterangepicker"],functio
           "format": "DD/MM/YYYY HH:mm",
         },
         "ranges": {
+          "Last 15 Minutes": [
+            last15MinutesRange.start,
+            last15MinutesRange.end
+          ],
+          "Last 30 Minutes": [
+            last30MinutesRange.start,
+            last30MinutesRange.end
+          ],
           "Today": [
             todayRange.start,
             todayRange.end
@@ -85,13 +101,27 @@ define(["backbone", "underscore", "jquery", "moment", "daterangepicker"],functio
         "startDate": startRange.start,
         "endDate": startRange.end,
       }, function (start, end, label) {
-        if(label != "Custom Range")
+        var val; //Date.parse(start.toDate().toUTCString()) + ' - ' + Date.parse(end.toDate().toUTCString());
+        var now = Date.parse(moment().toDate().toUTCString());
+        var momentStarted = Date.parse(self.timeFilterStarted.toDate().toUTCString());
+        var diff = now - momentStarted;
+        if(label != "Custom Range") {
           $('#time_filter span').html(label);
-        else
+
+          var startDate = Date.parse(start.toDate().toUTCString());
+
+          var endDate = Date.parse(end.toDate().toUTCString());
+
+          startDate += diff;
+          endDate += diff;
+          val = startDate + ' - ' + endDate;
+        }
+        else {
           $('#time_filter span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+        }
+
         self.cookieManager.setCookie("daterange", label, 365);
-        self.cookieManager.setCookie("daterange", label, 365);
-        var val = start.format('DD/MM/YYYY HH:mm') + ' - ' + end.format('DD/MM/YYYY HH:mm');
+
         self.cookieManager.setCookie("daterange-val", val, 365);
         $('#time_filter').trigger('change');
       });
@@ -290,6 +320,12 @@ define(["backbone", "underscore", "jquery", "moment", "daterangepicker"],functio
     },
 
     timeFilter: {
+      getLastXMinutes: function(x){
+        return {
+          start: moment().subtract(15, 'minutes'),
+          end: moment()
+        };
+      },
       getTodayRange: function(){
         return {
           start: moment().startOf('day'),
