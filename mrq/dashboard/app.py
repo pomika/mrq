@@ -227,12 +227,20 @@ def build_api_datatables_query(req):
         if (req.args.get("daterange")):
             print(req.args.get("daterange"))
             daterange = req.args.get("daterange").split("-")
+
             tem = int(daterange[0]) / 1000
             date_start = hex(tem)
-            start = ObjectId(date_start[2:len(date_start) - 1] + "0000000000000000")
+            start_partial = date_start[2:len(date_start) - 1];
+            while(len(start_partial) < 24):
+                start_partial += "0"
+            start = ObjectId(start_partial)
 
-            date_end = hex(int(daterange[1]) / 1000)
-            end = ObjectId(date_end[2:len(date_end) - 1] + "0000000000000000")
+            tem = int(daterange[1]) / 1000
+            date_end = hex(tem)
+            end_partial = date_end[2:len(date_end) - 1];
+            while(len(end_partial) < 24):
+                end_partial += "0"
+            end = ObjectId(end_partial)
 
             query["_id"] = {"$gt": start, "$lt": end}
         if req.args.get("id"):
