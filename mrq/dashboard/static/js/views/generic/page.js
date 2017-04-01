@@ -323,7 +323,7 @@ define(["backbone", "underscore", "jquery", "moment", "daterangepicker"],functio
     timeFilter: {
       getLastXMinutes: function(x){
         return {
-          start: moment().subtract(15, 'minutes'),
+          start: moment().subtract(x, 'minutes'),
           end: moment()
         };
       },
