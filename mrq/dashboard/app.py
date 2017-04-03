@@ -109,11 +109,17 @@ def api_jobstatuses():
     if request.args.get("iSortCol_0") == "0":
         if (request.args.get("sSortDir_0") == "desc"):
             sort = {"$sort": {"status": -1}}
-    stats = list(connections.mongodb_jobs.mrq_jobs.aggregate([
-        # https://jira.mongodb.org/browse/SERVER-11447
-        sort,
-        {"$group": {"_id": "$status", "jobs": {"$sum": 1}}}
-    ]))
+
+    group_criteria = list()
+    group_criteria.append(sort)
+    group_criteria.append({"$group": {"_id": "$status", "jobs": {"$sum": 1}}})
+
+    if request.args.get("jobs"):
+        group_criteria.append({"$match": {"jobs": int(request.args.get("jobs"))}})
+    if request.args.get("status"):
+        group_criteria.append({"$match": {"_id": {"$regex": request.args.get("status"), "$options": "-i"}}})
+
+    stats = list(connections.mongodb_jobs.mrq_jobs.aggregate(group_criteria))
 
     if request.args.get("iSortCol_0") == "1":
         if (request.args.get("sSortDir_0") == "asc"):
@@ -225,24 +231,30 @@ def build_api_datatables_query(req):
 
         # time filter
         if (req.args.get("daterange")):
-            print(req.args.get("daterange"))
             daterange = req.args.get("daterange").split("-")
 
-            tem = int(daterange[0]) / 1000
-            date_start = hex(tem)
-            start_partial = date_start[2:len(date_start) - 1];
-            while(len(start_partial) < 24):
-                start_partial += "0"
-            start = ObjectId(start_partial)
+            date_start = datetime.datetime.utcfromtimestamp(float(daterange[0][0:-3]))
+            date_end = datetime.datetime.utcfromtimestamp(float(daterange[1][0:-3]))
 
-            tem = int(daterange[1]) / 1000
-            date_end = hex(tem)
-            end_partial = date_end[2:len(date_end) - 1];
-            while(len(end_partial) < 24):
-                end_partial += "0"
-            end = ObjectId(end_partial)
+            query["datestarted"] = {"$gt": date_start, "$lt": date_end}
 
-            query["_id"] = {"$gt": start, "$lt": end}
+            # this code is to filter using the timestamp when was queued
+            # tem = int(daterange[0]) / 1000
+            # date_start = hex(tem)
+            # start_partial = date_start[2:len(date_start) - 1];
+            # while(len(start_partial) < 24):
+            #     start_partial += "0"
+            # start = ObjectId(start_partial)
+            #
+            # tem = int(daterange[1]) / 1000
+            # date_end = hex(tem)
+            # end_partial = date_end[2:len(date_end) - 1];
+            # while(len(end_partial) < 24):
+            #     end_partial += "0"
+            # end = ObjectId(end_partial)
+            #
+            # query["_id"] = {"$gt": start, "$lt": end}
+
         if req.args.get("id"):
             query["_id"] = ObjectId(req.args.get("id"))
 
@@ -275,6 +287,20 @@ def api_datatables(unit):
                     "queue": name,
                     "status": request.args.get("status") or "queued"
                 })
+
+            mongodbjobs = jobs
+            if mongodbjobs == None: mongodbjobs = 0
+
+
+            if request.args.get("name"):
+                if request.args.get("name") not in name:
+                    continue
+            if request.args.get("mongodbjobs"):
+                if int(request.args.get("mongodbjobs")) != mongodbjobs:
+                    continue
+            if request.args.get("redisjobs"):
+                if int(request.args.get("redisjobs")) != queue.size():
+                    continue
 
             q = {
                 "name": name,

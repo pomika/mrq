@@ -90,9 +90,9 @@ define(["backbone", "underscore", "jquery"],function(Backbone, _, $) {
       $("#navbar-main li.js-nav-"+id).addClass("active");
     },
 
-    queues: function() {
+    queues: function(params) {
       this.setNavbar("queues");
-      this.app.rootView.showChildPage('queues');
+      this.app.rootView.showChildPage('queues', {"options": {"params": params || {}}});
     },
 
     index: function() {
@@ -100,9 +100,9 @@ define(["backbone", "underscore", "jquery"],function(Backbone, _, $) {
       this.app.rootView.showChildPage('index');
     },
 
-    status: function() {
+    status: function(params) {
       this.setNavbar("status");
-      this.app.rootView.showChildPage('status');
+      this.app.rootView.showChildPage('status', {"options": {"params": params || {}}});
     },
 
     workers: function(params) {

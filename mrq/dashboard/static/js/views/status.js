@@ -6,7 +6,36 @@ define(["jquery", "underscore", "views/generic/datatablepage", "models", "moment
 
     template:"#tpl-page-status",
 
-    events:{
+    events: {
+      "click .js-datatable-filters-submit": "filterschanged"
+    },
+
+    initFilters: function () {
+      this.filters = {
+        "status": this.options.params.status || "",
+        "jobs": this.options.params.jobs || ""
+      };
+    },
+
+    setOptions: function (options) {
+      this.options = options;
+      this.initFilters();
+      this.flush();
+    },
+
+    filterschanged: function (evt) {
+      var self = this;
+
+      if (evt) {
+        evt.preventDefault();
+        evt.stopPropagation();
+      }
+
+      _.each(self.filters, function (v, k) {
+        self.filters[k] = self.$(".js-datatable-filters-" + k).val();
+      });
+
+      window.location = "/#status?" + $.param(self.filters, true).replace(/\+/g, "%20");
     },
 
     renderDatatable:function() {

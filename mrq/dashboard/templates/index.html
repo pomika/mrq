@@ -127,6 +127,31 @@
 
       <script id="tpl-page-queues" type="text/template">
 
+        <div class="container" style="margin-bottom:5px;">
+
+          <form class="form-inline js-datatable-filters pull-left" role="form">
+            <br/>
+            Filter by: &nbsp;
+            <div class="form-group">
+              <label class="sr-only" for="queues-form-name">Name</label>
+              <input type="text" class="form-control input-sm js-datatable-filters-name"
+                     id="queues-form-name" placeholder="Name" value="<%- filters.name %>">
+            </div>
+            <div class="form-group">
+              <label class="sr-only" for="queues-form-mongodbjobs">MongoDB Jobs</label>
+              <input type="number" class="form-control input-sm js-datatable-filters-mongodbjobs"
+                     id="queues-form-mongodbjobs" placeholder="MongoDB Jobs" value="<%- filters.mongodbjobs %>">
+            </div>
+            <div class="form-group">
+              <label class="sr-only" for="queues-form-redisjobs">Redis Jobs</label>
+              <input type="number" class="form-control input-sm js-datatable-filters-redisjobs"
+                     id="queues-form-redisjobs" placeholder="Redis Jobs" value="<%- filters.redisjobs %>">
+            </div>
+
+            <button type="submit" class="btn btn-default js-datatable-filters-submit input-sm" style="padding:5px">OK</button>
+          </form>
+        </div>
+
         <div class="container">
           <table cellpadding="0" cellspacing="0" border="0" class="datatable table table-striped table-bordered js-datatable">
           </table>
@@ -327,7 +352,7 @@
                      id="taskexceptions-form-exception" placeholder="Exception" value="<%- filters.exception %>">
             </div>
             <div class="form-group">
-              <label class="sr-only" for="taskexceptions-form-exception">Jobs</label>
+              <label class="sr-only" for="taskexceptions-form-jobs">Jobs</label>
               <input type="number" class="form-control input-sm js-datatable-filters-jobs"
                      id="taskexceptions-form-jobs" placeholder="Jobs" value="<%- filters.jobs %>">
             </div>
@@ -369,6 +394,26 @@
       <script id="tpl-page-status" type="text/template">
 
         <h3>Jobs by status</h3>
+
+        <div class="container" style="margin-bottom:5px;">
+
+          <form class="form-inline js-datatable-filters pull-left" role="form">
+            <br/>
+            Filter by: &nbsp;
+            <div class="form-group">
+              <label class="sr-only" for="jobsbystatus-form-status">Status</label>
+              <input type="text" class="form-control input-sm js-datatable-filters-status"
+                     id="jobsbystatus-form-status" placeholder="Status" value="<%- filters.status %>">
+            </div>
+            <div class="form-group">
+              <label class="sr-only" for="jobsbystatus-form-jobs">Jobs</label>
+              <input type="number" class="form-control input-sm js-datatable-filters-jobs"
+                     id="jobsbystatus-form-jobs" placeholder="Jobs" value="<%- filters.jobs %>">
+            </div>
+
+            <button type="submit" class="btn btn-default js-datatable-filters-submit input-sm" style="padding:5px">OK</button>
+          </form>
+        </div>
 
         <div class="container">
           <table cellpadding="0" cellspacing="0" border="0" class="datatable table table-striped table-bordered js-datatable">

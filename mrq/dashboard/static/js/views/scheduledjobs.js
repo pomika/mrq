@@ -1,4 +1,4 @@
-define(["jquery", "underscore", "views/generic/datatablepage", "models"],function($, _, DataTablePage, Models) {
+define(["jquery", "underscore", "views/generic/datatablepage", "models", "moment"],function($, _, DataTablePage, Models, moment) {
 
   return DataTablePage.extend({
 

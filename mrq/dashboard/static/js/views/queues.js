@@ -6,7 +6,37 @@ define(["jquery", "underscore", "views/generic/datatablepage", "models"],functio
 
     template:"#tpl-page-queues",
 
-    events:{
+    events: {
+      "click .js-datatable-filters-submit": "filterschanged"
+    },
+
+    initFilters: function () {
+      this.filters = {
+        "name": this.options.params.name || "",
+        "mongodbjobs": this.options.params.mongodbjobs || "",
+        "redisjobs": this.options.params.redisjobs || ""
+      };
+    },
+
+    setOptions: function (options) {
+      this.options = options;
+      this.initFilters();
+      this.flush();
+    },
+
+    filterschanged: function (evt) {
+      var self = this;
+
+      if (evt) {
+        evt.preventDefault();
+        evt.stopPropagation();
+      }
+
+      _.each(self.filters, function (v, k) {
+        self.filters[k] = self.$(".js-datatable-filters-" + k).val();
+      });
+
+      window.location = "/#queues?" + $.param(self.filters, true).replace(/\+/g, "%20");
     },
 
     renderDatatable:function() {
